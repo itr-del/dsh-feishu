@@ -1,0 +1,10 @@
+# 飞书插件的 cordis 元数据
+# 这个文件告诉 dsh/cordis-plugin-include 怎么加载本插件
+- id: feishu-bridge
+  name: '@local/dsh-feishu'
+  config:
+    # 实际值由用户的 cordis.patch.yml 覆盖
+    appId: !!js process.env.FEISHU_APP_ID || ''
+    appSecret: !!js process.env.FEISHU_APP_SECRET || ''
+    defaultProvider: 'deepseek-official'
+    defaultModel: 'deepseek-v4-flash'
