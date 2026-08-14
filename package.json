@@ -1,5 +1,5 @@
 {
-  "name": "@local/dsh-feishu",
+  "name": "dsh-feishu",
   "version": "0.1.0",
   "description": "Feishu (Lark) IM bridge for DeepSeek Harness (dsh)",
   "type": "module",
@@ -20,6 +20,9 @@
         "defaultProvider": "deepseek-official",
         "defaultModel": "deepseek-v4-flash"
       }
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
     }
   }
 }
