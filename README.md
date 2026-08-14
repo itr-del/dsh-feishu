@@ -106,4 +106,6 @@ MIT.
 
 Built while integrating dsh with a self-hosted Feishu bot on Ubuntu 22.04.
 
+📖 **Open-sourcing story**: [PUBLISHING.md](./PUBLISHING.md) — how this repo got published and listed.
+
 中文文档见 [README.zh.md](./README.zh.md)。
