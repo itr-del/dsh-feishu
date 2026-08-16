@@ -11,6 +11,8 @@
 └────────┘   API   └──────────────┘  events     └──────────┘  stream   └──────────┘
 ```
 
+![dsh-feishu — DeepSeek Harness × Feishu IM 桥接](./assets/hero.png)
+
 ## 功能
 
 - 一个飞书私聊用户 ↔ 一个持久化 dsh 会话（`feishu:<open_id>`）。
