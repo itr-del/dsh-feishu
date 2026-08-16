@@ -11,6 +11,8 @@
 └────────┘   API   └──────────────┘  events     └──────────┘  stream   └──────────┘
 ```
 
+![dsh-feishu — DeepSeek Harness × Feishu IM bridge](./assets/hero.png)
+
 ## Features
 
 - One Feishu DM user ↔ one persistent dsh session (`feishu:<open_id>`).
