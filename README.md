@@ -102,6 +102,12 @@ DM the bot anything — the agent will reply in the same conversation.
 
 MIT.
 
+## Acknowledgments
+
+- [DeepSeek Harness (dsh)](https://github.com/deepseek-ai/deepseek-harness) — the agent runtime this plugin extends.
+- [@larksuiteoapi/node-sdk](https://github.com/larksuite/node-sdk) — official Feishu (Lark) SDK, MIT licensed.
+- [DeepSeek API](https://platform.deepseek.com) — LLM backend.
+
 ## Author
 
 [itr-del](https://github.com/itr-del) — `13918029394@163.com`

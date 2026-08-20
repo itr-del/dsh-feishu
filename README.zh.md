@@ -100,6 +100,12 @@ dsh web
 
 MIT。
 
+## 致谢（第三方来源）
+
+- [DeepSeek Harness (dsh)](https://github.com/deepseek-ai/deepseek-harness) —— 本插件所扩展的 Agent 运行时。
+- [@larksuiteoapi/node-sdk](https://github.com/larksuite/node-sdk) —— 飞书官方 SDK，MIT 协议。
+- [DeepSeek API](https://platform.deepseek.com) —— 大模型后端。
+
 ## 作者
 
 [itr-del](https://github.com/itr-del) — `13918029394@163.com`
