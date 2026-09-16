@@ -19,6 +19,11 @@
 - 多轮对话跨重连保持。
 - 把助手回复流回飞书，4000 字分块。
 - 过滤 DeepSeek `<|DSML|...>` 工具调用标记。
+- **交互式提问桥接**：模型调用 `ask_user_question` 时，问题（含选项）会被渲染成文本发到飞书，
+  并立刻解开死锁 —— 否则在纯 IM 部署下这个工具会一直挂到超时（它只接受 dsh web 浏览器端的回答）。
+- **进度回传**：turn 跑超过 45 秒还没结束，就每 30 秒把新产出的正文增量发一次「进行中」消息。
+  长任务不再全程静默。
+- **超时看门狗**：turn 卡死时强制 `agent.cancel()` 并通知用户，阈值可配（默认 30 分钟）。
 - 纯 ESM，无需 TypeScript 编译。
 - 无遥测、完全本地。
 
@@ -80,6 +85,9 @@ dsh web
 | `DEEPSEEK_BASE_URL` | 否 | `https://api.deepseek.com` | 代理场景 |
 | `FEISHU_APP_ID` | 是 | — | 应用控制台里的 `cli_xxx` |
 | `FEISHU_APP_SECRET` | 是 | — | 应用控制台 —— **切勿提交** |
+| `DSH_FEISHU_WATCHDOG_TIMEOUT_MS` | 否 | `1800000`（30 分钟） | turn 卡死的强制取消阈值 |
+| `DSH_FEISHU_PROGRESS_AFTER_MS` | 否 | `45000` | 本轮跑多久之后才开始发进度更新 |
+| `DSH_FEISHU_PROGRESS_INTERVAL_MS` | 否 | `30000` | 相邻两条进度更新的最小间隔 |
 
 ## 消息流
 
@@ -89,12 +97,17 @@ dsh web
 4. 插件调用 `agent.followup(userMessage)`。
 5. agent 回到 `idle` 后，插件读取 `agent.session.events`，过滤 DSML 噪声，通过
    `larkClient.im.message.create(...)` 把回复发回飞书。
+6. turn 进行期间，一个 2 秒轮询的看门狗负责两件事：发现**未结算的 `ask_user_question` 调用**
+   就把它转投到飞书并取消该轮（解死锁）；turn 超过阈值就把正文增量作为「进行中」消息发出。
+   `ask_user_question` 与最终回复共用同一个 seq 游标，所以同一段文字不会发两遍。
 
 ## 限制
 
 - **仅文本**。图片/文件/卡片/post 消息未处理。
-- **不流式**。turn 结束后再发送回复。
+- **非增量 token 流式**。回复仍按整段发送；turn 进行中只有周期性「进度更新」（见上）。
 - **暂不支持群聊**。仅私聊。
+- **交互式 UI 工具降级**：`ask_user_question` / `exit_plan_mode` 在 dsh 里只接受 web 端回答。
+  IM 场景下插件会把问题转成文本并取消该轮（同时注入环境约束，让模型优先直接用正文提问）。
 
 ## 协议
 

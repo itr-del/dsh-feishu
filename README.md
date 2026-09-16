@@ -19,6 +19,13 @@
 - Multi-turn conversations across reconnects.
 - Streams assistant replies back into Feishu, chunked at 4000 chars.
 - Filters DeepSeek `<|DSML|...>` tool-call markers from outbound text.
+- **Interactive-question bridging.** `ask_user_question` payloads (with their options) are
+  rendered as plain chat text and the turn is unblocked immediately — otherwise the tool hangs
+  until the watchdog fires, because it only accepts answers from the dsh web browser client.
+- **Progress updates.** Once a turn has run past 45s, newly produced assistant text is flushed
+  to the chat every 30s, so long jobs are no longer silent.
+- **Watchdog.** A stalled turn is force-cancelled with a notice to the user; the timeout is
+  configurable (30 min default).
 - Pure ESM, no TypeScript compile step.
 - No telemetry, fully local.
 
@@ -82,6 +89,9 @@ DM the bot anything — the agent will reply in the same conversation.
 | `DEEPSEEK_BASE_URL` | no | `https://api.deepseek.com` | For proxies |
 | `FEISHU_APP_ID` | yes | — | `cli_xxx` from app console |
 | `FEISHU_APP_SECRET` | yes | — | From app console — **never commit** |
+| `DSH_FEISHU_WATCHDOG_TIMEOUT_MS` | no | `1800000` (30 min) | Force-cancel threshold for a stalled turn |
+| `DSH_FEISHU_PROGRESS_AFTER_MS` | no | `45000` | How long a turn runs before progress updates start |
+| `DSH_FEISHU_PROGRESS_INTERVAL_MS` | no | `30000` | Minimum gap between two progress updates |
 
 ## How a message flows
 
@@ -91,12 +101,21 @@ DM the bot anything — the agent will reply in the same conversation.
 4. Plugin calls `agent.followup(userMessage)`.
 5. When agent returns to `idle`, plugin reads `agent.session.events`, strips
    DSML noise, and posts the reply via `larkClient.im.message.create(...)`.
+6. While the turn runs, a 2s polling watchdog does two jobs: an **unsettled
+   `ask_user_question` call** is bridged to the chat (question + options) and the turn is
+   cancelled to unblock it; a turn running past the threshold gets its new assistant text
+   flushed as a "progress" message. Both share one seq cursor with the final reply, so no
+   text is ever sent twice.
 
 ## Limitations
 
 - **Text only.** Image / file / card / post messages are not handled.
-- **No streaming.** Reply sent after turn completes.
+- **No token-level streaming.** Replies are still sent as whole blocks; during a long turn you
+  only get periodic progress updates (see above).
 - **No groups yet.** DMs only.
+- **Interactive UI tools are degraded.** `ask_user_question` / `exit_plan_mode` only accept
+  answers from the dsh web client. Over IM the plugin renders the question as text and cancels
+  the turn, and injects an environment notice so the model prefers asking in prose.
 
 ## License
 
