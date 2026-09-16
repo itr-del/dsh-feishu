@@ -209,7 +209,22 @@ export class FeishuBridgeService extends Service {
         const handle = await this.getOrCreateAgent(sessionId)
         agent = handle.agent
         this.agentBySession.set(sessionId, agent)
-        this.lastRepliedSeqBySession.set(sessionId, 0)
+
+        // ⚠️ 关键修复：回复游标必须对齐到「当前会话已经走到哪」。
+        //    旧代码写死 0 ⇒ resume 一个长会话后，第一次 idle 会把**整个会话历史**
+        //    的 assistant 正文全量重发（2026-09-16 实测：1179 条消息 / 16.7 万字符
+        //    / 42 条飞书消息，开头还是 50 天前的第一条回复），用户观感是
+        //    "它突然把一堆历史项目状态又刷了一遍"。
+        //    对齐后只有本轮新产出的正文会被发送。
+        const existingEvents = agent.session?.events ?? []
+        const baselineSeq = existingEvents.length > 0
+          ? existingEvents[existingEvents.length - 1].seq
+          : 0
+        this.lastRepliedSeqBySession.set(sessionId, baselineSeq)
+        log(
+          this.ctx,
+          `reply cursor baselined at seq=${baselineSeq} (${existingEvents.length} existing events)`
+        )
 
         // ⚠️ 在 agent 自己的 ctx 上监听 status 变化
         // payload: { agent, status: 'idle' | 'running' }
