@@ -136,3 +136,17 @@ Built while integrating dsh with a self-hosted Feishu bot on Ubuntu 22.04.
 📖 **Open-sourcing story**: [PUBLISHING.md](./PUBLISHING.md) — how this repo got published and listed.
 
 中文文档见 [README.zh.md](./README.zh.md)。
+
+---
+
+## 👤 关于这个项目的我
+
+**我做这个的原因**：DeepSeek Harness 的会话在浏览器里，用它做日常工作的门槛太高——我想让它直接出现在飞书对话里。
+
+**我负责的部分**：整个插件——cordis 插件结构、飞书长连接、会话与 open_id 映射、流式回传与分片、工具调用标记过滤、交互式提问桥接、进度心跳、看门狗超时。
+
+**技术选择的关键取舍**：交互式提问那个坑最典型——`ask_user_question` 只认浏览器端应答，所以在飞书里会直接把回合挂死。我的取舍是**把它降级成纯文本问答并立即放行**，牺牲一点结构化，换回合不卡死。
+
+**做完之后的收获**：做"桥接"类工具时，**目标端的异常行为比接口本身更决定成败**。
+
+🔗 相关项目：[dsh-cue-bank](https://github.com/itr-del/dsh-cue-bank) · [全部项目](https://github.com/itr-del)
