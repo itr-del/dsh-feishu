@@ -129,7 +129,7 @@ MIT.
 
 ## Author
 
-[itr-del](https://github.com/itr-del) — `13918029394@163.com`
+**王嘉楠** ([itr-del](https://github.com/itr-del)) — `13918029394@163.com`
 
 Built while integrating dsh with a self-hosted Feishu bot on Ubuntu 22.04.
 
